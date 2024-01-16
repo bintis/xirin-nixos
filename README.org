@@ -1,0 +1,72 @@
+#+title: NixOS Config
+#+author: Emmet
+
+[[https://gitlab.com/librephoenix/nixos-config][Main Repo Link (GitLab)]]
+
+[[https://github.com/librephoenix/nixos-config][Mirror Repo Link (GitHub)]]
+
+[[https://codeberg.org/librephoenix/nixos-config][Mirror Repo Link (Codeberg)]]
+
+** What is this repository?
+These are my dotfiles (configuration files) for my NixOS setup(s).
+
+Here is my main setup:
+[[desktop.png]]
+
+** My 55+ Themes
+[[https://github.com/danth/stylix#readme][Stylix]] (and [[https://github.com/SenchoPens/base16.nix#readme][base16.nix]], of course) is amazing, allowing you to theme your entire system with base16-themes.
+
+Using this I have [[./themes][55+ themes]] (I add more sometimes) I can switch between on-the-fly. Visit the [[./themes][themes directory]] for more info and screenshots!
+
+** Install
+I wrote some reinstall notes for myself [[./install.org][here (install.org)]].
+
+** Modules
+Separate Nix files can be imported as modules using an import block:
+#+BEGIN_SRC nix
+imports = [ ./import1.nix
+            ./import2.nix
+            ...
+          ];
+#+END_SRC
+
+This conveniently allows configurations to be (*cough cough) /modular/ (ba dum, tssss).
+
+I have my modules separated into two groups:
+- System-level - stored in the [[./system][system directory]]
+  - System-level modules are imported into configuration.nix, which is what is sourced into [[./flake.nix][my flake (flake.nix)]]
+- User-level - stored in the [[./user][user directory]] (managed by home-manager)
+  - User-level modules are imported into home.nix, which is also sourced into [[./flake.nix][my flake (flake.nix)]]
+
+More detailed information on these specific modules are in the [[./system][system directory]] and [[./user][user directory]] respectively.
+
+** Patches
+In some cases, since I use =nixpgs-unstable=, I must patch nixpkgs. This can be done inside of a flake via:
+#+BEGIN_SRC nix
+    nixpkgs-patched = (import nixpkgs { inherit system; }).applyPatches {
+      name = "nixpkgs-patched";
+      src = nixpkgs;
+      patches = [ ./example-patch.nix ];
+    };
+
+    # configure pkgs
+    pkgs = import nixpkgs-patched { inherit system; };
+
+    # configure lib
+    lib = nixpkgs.lib;
+#+END_SRC
+
+Patches can either be local or remote, so you can even import unmerged pull requests by using =fetchpatch= and the raw patch url, i.e: https://github.com/NixOS/nixpkgs/pull/example.patch.
+
+I currently curate patches local to this repo in the [[./patches][patches]] directory.
+
+** Profiles
+I separate my configurations into [[./profiles][profiles]] (essentially system templates), i.e:
+- [[./profiles/personal][Personal]] - What I would run on a personal laptop/desktop
+- [[./profiles/work][Work]] - What I would run on a work laptop/desktop (if they let me bring my own OS :P)
+- [[./profiles/homelab][Homelab]] - What I would run on a server or homelab
+- [[./profiles/wsl][WSL]] - What I would run underneath Windows Subystem for Linux
+
+My profile can be conveniently selected in [[./flake.nix][my flake.nix]] by setting the =profile= variable.
+
+More detailed information on these profiles is in the [[./profiles][profiles directory]].
