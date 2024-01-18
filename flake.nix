@@ -16,7 +16,7 @@
     email = "soraphyr@gmail.com"; # email (used for certain configurations)
     dotfilesDir = "~/xirin"; # absolute path of the local repo
     theme = "monokai"; # selcted theme from my themes directory (./themes/)
-    wm = "hyprland"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
+    wm = "gnome"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
     wmType = "wayland"; # x11 or wayland
     browser = "chromium"; # Default browser; must select one from ./user/app/browser/
     editor = "nvim"; # Default editor;

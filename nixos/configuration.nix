@@ -32,7 +32,7 @@
   time.timeZone = "Asia/Tokyo";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "ja";
+  i18n.defaultLocale = "en_GB.UTF-8";
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "ja_JP.UTF-8";
@@ -108,15 +108,11 @@
     # Whether to enable patching wlroots for better Nvidia support
   };
 
-  # Configure keymap in X11
- # services.xserver = {
- #   layout = "us";
-  #  xkbVariant = "";
-  #};
 
-  # Enable CUPS to print documents.
-#  services.printing.enable = true;
-
+ #services
+#  services.devmon.enable = true;
+#  services.gvfs.enable = true; 
+#  services.udisks2.enable = true;
   
  # services.flatpak.enable = true; 
  # services.roon-bridge.enable = true;
@@ -147,8 +143,6 @@
     description = "Bintis";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-  #    telegram-desktop
-  #    vim
     #  thunderbird
     ];
   };
@@ -193,16 +187,7 @@
   home-manager
   alacritty
   ];
-  nixpkgs.config.permittedInsecurePackages = [
-  "electron-25.9.0"
-  ];
-  nixpkgs.config = {
-     firefox = {
-     enableGoogleTalkPlugin = true;
-     enableAdobeFlash = true;
-    };
-  };
-
+  
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -229,7 +214,8 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.11"; # Did you read the comment?
+ 
+ system.stateVersion = "23.11"; 
   nix = {
     settings = {
       experimental-features = ["nix-command" "flakes"];

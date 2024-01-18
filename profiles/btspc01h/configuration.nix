@@ -11,7 +11,8 @@
       #  ( import ../../system/app/docker.nix {storageDriver = "btrfs"; inherit username pkgs config lib;} )
       #../../system/app/gamemode.nix
       #../../system/app/steam.nix
-      #../../system/app/prismlauncher.nix
+      ../../system/hardware/autofs.nix
+       ../../system/app/prismlauncher.nix
        ../../system/security/doas.nix
        ../../system/security/gpg.nix
        ../../system/security/blocklist.nix

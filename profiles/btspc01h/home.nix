@@ -59,6 +59,7 @@
 
   home.packages = with pkgs; [
     # Core
+    autofs5
     zsh
     alacritty   
     obsidian
