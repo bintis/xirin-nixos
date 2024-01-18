@@ -28,6 +28,7 @@
               #../../user/app/flatpak/flatpak.nix # Flatpaks
                ../../user/style/stylix.nix # Styling and themes for my apps
                ../../user/lang/cc/cc.nix # C and C++ tools
+               ../../user/lang/python/python.nix
                ../../user/lang/rust/rust.nix
                #../../user/hardware/bluetooth.nix # Bluetooth
 
@@ -48,6 +49,14 @@
     ];
   };
    
+  # Set keymap for console
+  
+  #useXkbConfig = true;
+  #keyMap = "jp";
+ 
+
+
+
   home.packages = with pkgs; [
     # Core
     zsh
@@ -61,6 +70,7 @@
     dmenu
     rofi
     git
+    cloudflare-warp
     #syncthing
     # Media
    #tuxpaint

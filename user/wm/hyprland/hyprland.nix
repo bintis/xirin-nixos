@@ -115,7 +115,7 @@
 
        #bind=ALTALT,S,exec,container-open # qutebrowser only
 
-       bind=ALT,code:58,exec,qq --gtk-version=4
+       bind=ALT,X,exec,qq --gtk-version=4
 
        bind=ALTCTRL,R,exec,killall .waybar-wrapped && waybar & disown
 
@@ -247,7 +247,7 @@
        env = QT_QPA_PLATFORMTHEME,qt5ct
 
        input {
-         kb_layout = us
+         kb_layout = jp
          kb_options = caps:escape
          repeat_delay = 350
          repeat_rate = 50
