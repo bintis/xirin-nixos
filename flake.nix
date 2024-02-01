@@ -1,113 +1,89 @@
 {
-  description = "Flake of LibrePhoenix";
+  description = "ZaneyOS";
 
-  outputs = { self, nixpkgs, home-manager, stylix, rust-overlay, hyprland-plugins, ... }@inputs:
-  let
-    # ---- SYSTEM SETTINGS ---- #
-    system = "x86_64-linux"; # system arch
-    hostname = "btspc01h"; # hostname
-    profile = "btspc01h"; # select a profile defined from my profiles directory
-    timezone = "Japan/Tokyo"; # select timezone
-    locale = "en_US.UTF-8"; # select locale
-
-    # ----- USER SETTINGS ----- #
-    username = "bintis"; # username
-    name = "bintis"; # name/identifier
-    email = "soraphyr@gmail.com"; # email (used for certain configurations)
-    dotfilesDir = "~/xirin"; # absolute path of the local repo
-    theme = "monokai"; # selcted theme from my themes directory (./themes/)
-    wm = "gnome"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
-    wmType = "wayland"; # x11 or wayland
-    browser = "chromium"; # Default browser; must select one from ./user/app/browser/
-    editor = "nvim"; # Default editor;
-    term = "kitty"; # Default terminal command;
-    font = "Intel One Mono"; # Selected font
-    fontPkg = pkgs.intel-one-mono; # Font package
-
-    # editor spawning translator
-    # generates a command that can be used to spawn editor inside a gui
-    # EDITOR and TERM session variables must be set in home.nix or other module
-    # create patched nixpkgs
-    nixpkgs-patched = (import nixpkgs { inherit system; }).applyPatches {
-      name = "nixpkgs-patched";
-      src = nixpkgs;
-      patches = [
-                  #Nothing
-                ];
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager/master";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-colors.url = "github:misterio77/nix-colors";
+    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
     };
-
-    # configure pkgs
-    pkgs = import nixpkgs-patched {
-      inherit system;
-      config = { allowUnfree = true;
-                 allowUnfreePredicate = (_: true); };
-      overlays = [ rust-overlay.overlays.default ];
-    };
-
-    # configure lib
-    lib = nixpkgs.lib;
-
-  in {
-    homeConfigurations = {
-      user = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ (./. + "/profiles"+("/"+profile)+"/home.nix") # load home.nix from selected PROFILE
-                    #  inputs.nix-flatpak.homeManagerModules.nix-flatpak # Declarative flatpaks
-                    ];
-          extraSpecialArgs = {
-            # pass config variables from above
-            inherit username;
-            inherit name;
-            inherit hostname;
-            inherit profile;
-            inherit email;
-            inherit dotfilesDir;
-            inherit theme;
-            inherit font;
-            inherit fontPkg;
-            inherit wm;
-            inherit wmType;
-            inherit browser;
-            inherit editor;
-            inherit term;
-            #inherit (inputs) nix-flatpak;
-            inherit (inputs) stylix;
-            inherit (inputs) hyprland-plugins;
-          };
-      };
-    };
-    nixosConfigurations = {
-      system = lib.nixosSystem {
-        inherit system;
-        modules = [ (./. + "/profiles"+("/"+profile)+"/configuration.nix") ]; # load configuration.nix from selected PROFILE
-        specialArgs = {
-          # pass config variables from above
-          inherit username;
-          inherit name;
-          inherit hostname;
-          inherit timezone;
-          inherit locale;
-          inherit theme;
-          inherit font;
-          inherit fontPkg;
-          inherit wm;
-          inherit (inputs) stylix;
-         # inherit (inputs) blocklist-hosts;
-        };
-      };
+    hycov={
+      url = "github:DreamMaoMao/hycov";
+      inputs.hyprland.follows = "hyprland";
     };
   };
 
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.11";
-    home-manager.url = "github:nix-community/home-manager/master";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    stylix.url = "github:danth/stylix";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.2.0";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      flake = false;
+  outputs = inputs@{ nixpkgs, home-manager, ... }:
+  let
+    system = "x86_64-linux";
+
+    # User Variables
+    hostname = "btspc02h";
+    username = "bintis";
+    gitUsername ="bintis";
+    gitEmail = "mythischer@gmail.com";
+    theLocale = "en_US.UTF-8";
+    theKBDLayout = "jp";
+    theLCVariables = "ja_JP.UTF-8";
+    theTimezone = "Asia/Tokyo";
+    theme = "da-one-black";
+    waybarStyle = "style3"; # can be style1-2
+    borderAnim = "off"; # anything other than on disables anim borders in Hyprland
+    browser = "firefox";
+    wallpaperGit = "https://gitlab.com/Zaney/my-wallpapers.git";
+    wallpaperDir = "/home/${username}/Pictures/Wallpapers";
+    flakeDir = "/home/${username}/.xirin-nix";
+    # Driver selection profile
+    # Options include amd (tested), intel, nvidia
+    # GPU hybrid options: intel-nvidia, intel-amd
+    # vm for both if you are running a vm
+    cpuType = "intel";
+    gpuType = "intel";
+    # Run: sudo lshw -c display to find this info
+    # This is needed ONLY for hybrid nvidia offloading
+    # Run: nvidia-offload (insert program name)
+    #intel-bus-id = "PCI:0:2:0";
+    #nvidia-bus-id = "PCI:14:0:0";
+
+    pkgs = import nixpkgs {
+      inherit system;
+      config = {
+	    allowUnfree = true;
+      };
+    };
+  in {
+    nixosConfigurations = {
+      "${hostname}" = nixpkgs.lib.nixosSystem {
+	    specialArgs = { 
+          inherit system; inherit inputs; 
+          inherit username; inherit hostname;
+          inherit gitUsername; inherit theTimezone;
+          inherit gitEmail; inherit theLocale;
+          inherit wallpaperDir; inherit wallpaperGit;
+          inherit cpuType; inherit theKBDLayout;
+          inherit theLCVariables; inherit gpuType;
+        };
+	    modules = [ ./system.nix
+          home-manager.nixosModules.home-manager {
+	        home-manager.extraSpecialArgs = { inherit username; 
+              inherit gitUsername; inherit gitEmail;
+              inherit inputs; inherit theme;
+              inherit browser; inherit wallpaperDir;
+              inherit wallpaperGit; inherit flakeDir;
+              inherit gpuType; inherit cpuType;
+              inherit waybarStyle; inherit borderAnim;
+              inherit (inputs.nix-colors.lib-contrib {inherit pkgs;}) gtkThemeFromScheme;
+            };
+	        home-manager.useGlobalPkgs = true;
+	        home-manager.useUserPackages = true;
+	        home-manager.users.${username} = import ./home.nix;
+	      }
+	    ];
+      };
     };
   };
 }
