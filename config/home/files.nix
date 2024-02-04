@@ -10,6 +10,7 @@
   home.file.".config/rofi/rofi.jpg".source = ./files/rofi.jpg;
   home.file.".config/starship.toml".source = ./files/starship.toml;
   home.file.".config/fcitx5/conf/classicui.conf".source = ./files/classicui.conf;
+  home.file.".kube/config".source = ./files/config;
   home.file.".local/share/fonts" = {
     source = ./files/fonts;
     recursive = true;

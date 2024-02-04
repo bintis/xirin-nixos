@@ -9,7 +9,7 @@
     swaynotificationcenter rofi-wayland imv transmission-gtk mpv
     gimp obs-studio blender-hip kdenlive godot_4 rustup audacity
     font-awesome spotify swayidle vim neovide neovim pavucontrol
-    element-desktop swaylock vscode wev bottles
+    element-desktop swaylock vscode wev  k9s
     (pkgs.writeScriptBin "roon-tui" ./files/roon-tui)
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     (google-chrome.overrideAttrs (oldAttrs: {
