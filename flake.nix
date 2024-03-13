@@ -15,39 +15,17 @@
       url = "github:DreamMaoMao/hycov";
       inputs.hyprland.follows = "hyprland";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    impermanence.url = "github:nix-community/impermanence";
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }:
+  outputs = inputs@{ nixpkgs, home-manager, impermanence, ... }:
   let
     system = "x86_64-linux";
-
-    # User Variables
-    hostname = "btspc02h";
-    username = "bintis";
-    gitUsername ="bintis";
-    gitEmail = "mythischer@gmail.com";
-    theLocale = "en_US.UTF-8";
-    theKBDLayout = "jp";
-    theLCVariables = "ja_JP.UTF-8";
-    theTimezone = "Asia/Tokyo";
-    theme = "da-one-black";
-    waybarStyle = "style3"; # can be style1-2
-    borderAnim = "off"; # anything other than on disables anim borders in Hyprland
-    browser = "firefox";
-    wallpaperGit = "https://gitlab.com/Zaney/my-wallpapers.git";
-    wallpaperDir = "/home/${username}/Pictures/Wallpapers";
-    flakeDir = "/home/${username}/.xirin-nix";
-    # Driver selection profile
-    # Options include amd (tested), intel, nvidia
-    # GPU hybrid options: intel-nvidia, intel-amd
-    # vm for both if you are running a vm
-    cpuType = "intel";
-    gpuType = "intel";
-    # Run: sudo lshw -c display to find this info
-    # This is needed ONLY for hybrid nvidia offloading
-    # Run: nvidia-offload (insert program name)
-    #intel-bus-id = "PCI:0:2:0";
-    #nvidia-bus-id = "PCI:14:0:0";
+    inherit (import ./options.nix) username hostname;
 
     pkgs = import nixpkgs {
       inherit system;
@@ -58,32 +36,26 @@
   in {
     nixosConfigurations = {
       "${hostname}" = nixpkgs.lib.nixosSystem {
-	    specialArgs = { 
+	specialArgs = { 
           inherit system; inherit inputs; 
           inherit username; inherit hostname;
-          inherit gitUsername; inherit theTimezone;
-          inherit gitEmail; inherit theLocale;
-          inherit wallpaperDir; inherit wallpaperGit;
-          inherit cpuType; inherit theKBDLayout;
-          inherit theLCVariables; inherit gpuType;
         };
-	    modules = [ ./system.nix
+	modules = [ 
+	  ./system.nix
+	  impermanence.nixosModules.impermanence
           home-manager.nixosModules.home-manager {
-	        home-manager.extraSpecialArgs = { inherit username; 
-              inherit gitUsername; inherit gitEmail;
-              inherit inputs; inherit theme;
-              inherit browser; inherit wallpaperDir;
-              inherit wallpaperGit; inherit flakeDir;
-              inherit gpuType; inherit cpuType;
-              inherit waybarStyle; inherit borderAnim;
+	    home-manager.extraSpecialArgs = {
+	      inherit username; inherit inputs;
               inherit (inputs.nix-colors.lib-contrib {inherit pkgs;}) gtkThemeFromScheme;
             };
-	        home-manager.useGlobalPkgs = true;
-	        home-manager.useUserPackages = true;
-	        home-manager.users.${username} = import ./home.nix;
-	      }
-	    ];
+	    home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
+	    home-manager.users.${username} = import ./home.nix;
+	  }
+	];
       };
     };
   };
 }
+

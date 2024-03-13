@@ -1,6 +1,8 @@
-{ config, pkgs, flakeDir, ... }:
+{ config, lib, pkgs, ... }:
 
-{
+let inherit (import ../../options.nix) flakeDir flakePrev 
+	     hostname flakeBackup theShell; in
+lib.mkIf (theShell == "bash") {
   # Configure Bash
   programs.bash = {
     enable = true;
@@ -9,27 +11,30 @@
       #if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
       #  exec Hyprland
       #fi
+    '';
+    initExtra = ''
+      neofetch
       if [ -f $HOME/.bashrc-personal ]; then
         source $HOME/.bashrc-personal
       fi
     '';
-    initExtra = ''
-      neofetch
-    '';
     sessionVariables = {
-    
+      ZANEYOS = true;
+      FLAKEBACKUP = "${flakeBackup}";
+      FLAKEPREV = "${flakePrev}";
     };
     shellAliases = {
-      sv="sudo vim";
-      flake-rebuild="sudo nixos-rebuild switch --flake ${flakeDir}";
-      flake-update="sudo nix flake update ${flakeDir}";
+      sv="sudo nvim";
+      flake-rebuild="nh os switch --nom --hostname ${hostname}";
+      flake-update="nh os switch --nom --hostname ${hostname} --update";
       gcCleanup="nix-collect-garbage --delete-old && sudo nix-collect-garbage -d && sudo /run/current-system/bin/switch-to-configuration boot";
-      v="vim";
+      v="nvim";
       ls="lsd";
       ll="lsd -l";
       la="lsd -a";
       lal="lsd -al";
       ".."="cd ..";
+      neofetch="neofetch --ascii ~/.config/ascii-neofetch";
     };
   };
 }

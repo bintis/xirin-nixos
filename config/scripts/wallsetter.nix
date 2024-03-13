@@ -10,20 +10,31 @@ pkgs.writeShellScriptBin "wallsetter" ''
   WALLPAPER=$(find ${wallpaperDir} -name '*' | awk '!/.git/' | tail -n +2 | shuf -n 1)
   PREVIOUS=$WALLPAPER
   if [ -d ${wallpaperDir} ]; then
-    cd ${wallpaperDir}
-    git pull
+    num_files=$(ls -1 ${wallpaperDir} | wc -l)
+
+    if [ $num_files -lt 1 ]; then
+      notify-send -t 9000 "The wallpaper folder is expected to have more than 1 image. Exiting Wallsetter."
+      exit
+    else
+      cd ${wallpaperDir}
+      if [ -d ".git" ]; then
+        git pull
+      else
+        notify-send -t 9000 "The wallpaper directory is expected to be a Git repository. Exiting Wallsetter."
+        exit
+      fi
+    fi
   else
     ${pkgs.git}/bin/git clone ${wallpaperGit} ${wallpaperDir}
     chown -R ${username}:users ${wallpaperDir}
   fi
   while true;
   do
-    if [ "$WALLPAPER" == "$PREVIOUS" ]
-    then
+    if [ "$WALLPAPER" == "$PREVIOUS" ]; then
       WALLPAPER=$(find ${wallpaperDir} -name '*' | awk '!/.git/' | tail -n +2 | shuf -n 1)
     else
       PREVIOUS=$WALLPAPER
-      NUM=$(shuf -i 1-5 -n 1)
+      NUM=$(shuf -e 1 2 3 4 5 -n 1)
       case $NUM in
         1)
           TRANSITION=$TRANSITION1

@@ -1,10 +1,11 @@
-{ pkgs, config, lib, gpuType, ... }:
+{ pkgs, config, lib, ... }:
 
+let inherit (import ../../options.nix) gpuType; in
 lib.mkIf ("${gpuType}" == "amd") {
   systemd.tmpfiles.rules = [
     "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
   ];
-  services.xserver.enable = true;
+  services.xserver.enable = false;
   services.xserver.videoDrivers = [ "amdgpu" ];
   # OpenGL
   hardware.opengl = {

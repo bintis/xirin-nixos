@@ -1,9 +1,11 @@
 { config, pkgs, inputs, username,
-  gitUsername, gitEmail, gtkThemeFromScheme,
-  theme, browser, wallpaperDir, wallpaperGit,
-  flakeDir, waybarStyle, ... }:
-
-{
+  gtkThemeFromScheme, ... }:
+let 
+  inherit (import ./options.nix)
+    gitUsername gitEmail theme browser 
+    wallpaperDir wallpaperGit flakeDir 
+    waybarStyle;
+in {
   # Home Manager Settings
   home.username = "${username}";
   home.homeDirectory = "/home/${username}";
@@ -15,19 +17,10 @@
   # Import Program Configurations
   imports = [
     inputs.nix-colors.homeManagerModules.default
+    inputs.nixvim.homeManagerModules.nixvim
     inputs.hyprland.homeManagerModules.default
     ./config/home
   ];
-
-
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = with pkgs; [ 
-      fcitx5-mozc
-      fcitx5-rime 
-    ];
-  };
-
 
   # Define Settings For Xresources
   xresources.properties = {

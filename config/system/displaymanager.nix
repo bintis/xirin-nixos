@@ -1,14 +1,18 @@
-{ pkgs, config, theKBDLayout, ... }:
+{ pkgs, config, ... }:
 
+let inherit (import ../../options.nix) theKBDVariant
+theKBDLayout theSecondKBDLayout; in
 {
   services.xserver = {
     enable = false;
-    layout = "${theKBDLayout}";
-    xkbVariant = "";
-    libinput.enable = true;
+    xkb = {
+      variant = "${theKBDVariant}";
+      layout = "${theKBDLayout}, ${theSecondKBDLayout}";
+    };
+    libinput.enable = false;
     displayManager.sddm = {
       enable = false;
-      autoNumlock = true;
+      autoNumlock = false;
       wayland.enable = true;
       theme = "tokyo-night-sddm";
     };
@@ -23,4 +27,15 @@ in [
     tokyo-night # Name: tokyo-night-sddm
     pkgs.libsForQt5.qt5.qtgraphicaleffects
   ];
+
+  services.greetd = {
+    enable = true;
+    settings = rec {
+      initial_session = {
+        command = "Hyprland";
+        user = "bintis";
+      };
+      default_session = initial_session;
+    };
+  };
 }

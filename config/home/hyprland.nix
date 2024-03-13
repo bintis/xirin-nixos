@@ -1,27 +1,33 @@
-{ pkgs, config, lib, browser,
-  cpuType, gpuType, wallpaperDir,
-  inputs, borderAnim, ... }:
+{ pkgs, config, lib, inputs, ... }:
 
 let
-  theme = config.colorScheme.colors;
+  theme = config.colorScheme.palette;
   hyprplugins = inputs.hyprland-plugins.packages.${pkgs.system};
   hycov = inputs.hycov.packages.${pkgs.system};
+  inherit (import ../../options.nix) 
+    browser cpuType gpuType
+    wallpaperDir borderAnim
+    theKBDLayout terminal
+    theSecondKBDLayout
+    theKBDVariant sdl-videodriver;
 in with lib; {
   wayland.windowManager.hyprland = {
     enable = true;
-    xwayland.enable = false;
+    xwayland.enable = true;
     systemd.enable = true;
     plugins = [
-#      hyprplugins.hyprtrails
-      hycov.hycov
+      # hyprplugins.hyprtrails
+      #  hycov.hycov
     ];
     extraConfig = let
       modifier = "ALT";
     in concatStrings [ ''
       monitor=,preferred,auto,1.5
       windowrule = float, ^(steam)$
-      windowrule = center, ^(steam)$
       windowrule = size 1080 900, ^(steam)$
+      windowrule = center, ^(steam)$
+      windowrule = fullscreen, ^(wlogout)$
+      windowrule = animation fade,^(wlogout)$
       general {
         gaps_in = 6
         gaps_out = 8
@@ -31,8 +37,10 @@ in with lib; {
         layout = dwindle
         resize_on_border = true
       }
+
       input {
-        kb_layout = jp
+        kb_layout = ${theKBDLayout}, ${theSecondKBDLayout}
+	kb_options = grp:alt_shift_toggle
         kb_options=caps:super
         follow_mouse = 1
         touchpad {
@@ -41,8 +49,6 @@ in with lib; {
         sensitivity = 0 # -1.0 - 1.0, 0 means no modification.
         accel_profile = flat
       }
-      env = XMODIFIERS=@im=fcitx
-      env = QT_IM_MODULE=fcitx
       env = NIXOS_OZONE_WL, 1
       env = NIXPKGS_ALLOW_UNFREE, 1
       env = XDG_CURRENT_DESKTOP, Hyprland
@@ -50,9 +56,7 @@ in with lib; {
       env = XDG_SESSION_DESKTOP, Hyprland
       env = GDK_BACKEND, wayland
       env = CLUTTER_BACKEND, wayland
-      env = SDL_VIDEODRIVER, wayland
-      env = XCURSOR_SIZE, 24
-      env = XCURSOR_THEME, Bibata-Modern-Ice
+      env = SDL_VIDEODRIVER, ${sdl-videodriver}
       env = QT_QPA_PLATFORM, wayland
       env = QT_WAYLAND_DISABLE_WINDOWDECORATION, 1
       env = QT_AUTO_SCREEN_SCALE_FACTOR, 1
@@ -74,6 +78,10 @@ in with lib; {
         mouse_move_enables_dpms = true
         key_press_enables_dpms = false
       }
+      # unscale XWayland
+      xwayland {
+        force_zero_scaling = true
+      }
       animations {
         enabled = yes
         bezier = wind, 0.05, 0.9, 0.1, 1.05
@@ -85,7 +93,7 @@ in with lib; {
         animation = windowsOut, 1, 5, winOut, slide
         animation = windowsMove, 1, 5, wind, slide
         animation = border, 1, 1, liner
-        ${if borderAnim == "on" then ''
+        ${if borderAnim == true then ''
           animation = borderangle, 1, 30, liner, loop
         '' else ''
         ''}
@@ -104,9 +112,9 @@ in with lib; {
         }
       }
       plugin {
-#        hyprtrails {
-#          color = rgba(${theme.base0A}ff)
-#        }
+        hyprtrails {
+          color = rgba(${theme.base0A}ff)
+        }
         hycov {
           overview_gappo = 60 #gaps width from screen
           overview_gappi = 24 #gaps width from clients
@@ -116,13 +124,14 @@ in with lib; {
       }
       exec-once = $POLKIT_BIN
       exec-once = dbus-update-activation-environment --systemd --all
-      exec-once = systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP NIXOS_OZONE_WL XMODIFIERS=@im QT_IM_MODULE
-      exec-once = hyprctl setcursor Bibata-Modern-Ice 24
+      exec-once = systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
       exec-once = swww init
       exec-once = waybar
       exec-once = swaync
       exec-once = wallsetter
-      exec-once = swayidle -w timeout 720 'swaylock -f' timeout 800 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'swaylock -f -c 000000'
+      exec-once = nm-applet --indicator
+      exec-once = fcitx5 -d
+      #exec-once = swayidle -w timeout 720 'swaylock -f' timeout 800 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'swaylock -f -c 000000'
       dwindle {
         pseudotile = true
         preserve_split = true
@@ -131,56 +140,34 @@ in with lib; {
         new_is_master = true
       }
 
-     windowrule=float,^(kitty)$
-     windowrule=center,^(kitty)$
-     windowrule=float,^(blueman-manager)$
-     windowrule=size 1280 800,^(kitty)$
-     windowrule=size 934 525,^(mpv)$
-     windowrule=float,^(mpv)$
-     windowrule=center,^(mpv)$ 
 
+      #bind=SUPER,tab,hycov:toggleoverview
+      #bind=SUPER,left,hycov:movefocus,l
+      #bind=SUPER,right,hycov:movefocus,r
+      #bind=SUPER,up,hycov:movefocus,u
+      #bind=SUPER,down,hycov:movefocus,d
 
-     $kitty = class:^(kitty)$
-
-
-     $pavucontrol = class:^(pavucontrol)$
-     windowrulev2 = float,$pavucontrol
-     windowrulev2 = size 49.5% 40%,$pavucontrol
-     windowrulev2 = move 50% 3%,$pavucontrol
-     windowrulev2 = workspace special ,$kitty
-     windowrulev2 = opacity 0.80,$pavucontrol
-
-
-     bind=SUPER,tab,hycov:toggleoverview
-     bind=SUPER,left,hycov:movefocus,l
-     bind=SUPER,right,hycov:movefocus,r
-     bind=SUPER,up,hycov:movefocus,u
-     bind=SUPER,down,hycov:movefocus,d
- 
-      
-      bind=ALT,TAB,cyclenext
-      bind=ALT,TAB,bringactivetotop
-      bind=ALTSHIFT,TAB,cyclenext,prev   
-      bind=ALTSHIFT,TAB,bringactivetotop
-      bind=ALT,SPACE,workspaceopt,allfloat
-
-      bind=${modifier}SHIFT,S,movetoworkspacesilent,special
-      bind=${modifier},S,togglespecialworkspace,
-#      bind=${modifier},E,movetoworkspace,-1
-
-      bind = ${modifier},Return,exec,kitty
-      bind = ${modifier}SHIFT,Return,exec,rofi -show drun
-#      bind = ${modifier}SHIFT,W,exec,kitty -e amfora
-#     bind = ${modifier}SHIFT,S,exec,swaync-client -rs
-#     bind = ${modifier},W,exec,${browser}
-#     bind = ${modifier},E,exec,emopicker9000
-      bind = ${modifier},PRINT,exec,grim -g "$(slurp)" | wl-copy
-      bind = ${modifier},B,exec,google-chrome-stable
-      bind = ${modifier},O,exec,obsidian
+      bind =  CTRL, LEFT, exec, hyprnome --previous
+      bind =  CTRL, RIGHT, exec, hyprnome
+      bind =  CTRL, UP, exec, hyprnome --previous --move
+      bind =  CTRL, DOWN, exec, hyprnome --move
+      bind = ${modifier},Return,exec,alacritty
+      bind = ${modifier}SHIFT,Return,exec,rofi-launcher
+      bind = ${modifier}SHIFT,W,exec,web-search
+      bind = ${modifier}SHIFT,N,exec,swaync-client -rs
+      ${if browser == "google-chrome" then ''
+	bind = ${modifier},W,exec,google-chrome-stable
+      '' else ''
+	bind = ${modifier},W,exec,${browser}
+      ''}
+      bind = ${modifier},E,exec,emopicker9000
+      bind = ${modifier},S,exec,screenshootin
+      bind = ${modifier},D,exec,discord
+      bind = ${modifier},O,exec,obs
       bind = ${modifier},G,exec,gimp
       bind = ${modifier}SHIFT,G,exec,godot4
       bind = ${modifier},T,exec,thunar
-      bind = ${modifier},M,exec,qq
+      bind = ${modifier},M,exec,spotify
       bind = ${modifier},Q,killactive,
       bind = ${modifier},P,pseudo,
       bind = ${modifier}SHIFT,I,togglesplit,
@@ -213,6 +200,8 @@ in with lib; {
       bind = ${modifier},8,workspace,8
       bind = ${modifier},9,workspace,9
       bind = ${modifier},0,workspace,10
+      bind = ${modifier}SHIFT,SPACE,movetoworkspace,special
+      bind = ${modifier},SPACE,togglespecialworkspace
       bind = ${modifier}SHIFT,1,movetoworkspace,1
       bind = ${modifier}SHIFT,2,movetoworkspace,2
       bind = ${modifier}SHIFT,3,movetoworkspace,3
@@ -223,12 +212,21 @@ in with lib; {
       bind = ${modifier}SHIFT,8,movetoworkspace,8
       bind = ${modifier}SHIFT,9,movetoworkspace,9
       bind = ${modifier}SHIFT,0,movetoworkspace,10
+      bind = ${modifier}CONTROL,right,workspace,e+1
+      bind = ${modifier}CONTROL,left,workspace,e-1
       bind = ${modifier},mouse_down,workspace, e+1
       bind = ${modifier},mouse_up,workspace, e-1
       bindm = ${modifier},mouse:272,movewindow
       bindm = ${modifier},mouse:273,resizewindow
+      bind = ALT,Tab,cyclenext
+      bind = ALT,Tab,bringactivetotop
       bind = ,XF86AudioRaiseVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
       bind = ,XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+      binde = ,XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+      bind = ,XF86AudioPlay, exec, playerctl play-pause
+      bind = ,XF86AudioPause, exec, playerctl play-pause
+      bind = ,XF86AudioNext, exec, playerctl next
+      bind = ,XF86AudioPrev, exec, playerctl previous
       bind = ,XF86MonBrightnessDown,exec,brightnessctl set 5%-
       bind = ,XF86MonBrightnessUp,exec,brightnessctl set +5%
     '' ];
