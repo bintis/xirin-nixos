@@ -269,7 +269,7 @@ in
   ];
 
   fonts.packages = with pkgs; [
-    noto-fonts-emoji noto-fonts-cjk font-awesome material-icons
+    noto-fonts-emoji noto-fonts-cjk-sans font-awesome material-icons
   ];
 
   environment.variables = {
