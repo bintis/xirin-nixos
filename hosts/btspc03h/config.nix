@@ -15,17 +15,11 @@ in
   imports = [
     ./hardware.nix
     ./users.nix
-    ../../modules/amd-drivers.nix
-    ../../modules/nvidia-drivers.nix
-    ../../modules/fcitx5.nix
-    ../../modules/nvidia-prime-drivers.nix
     ../../modules/intel-drivers.nix
+    ../../modules/fcitx5.nix
     ../../modules/vm-guest-services.nix
     ../../modules/local-hardware-clock.nix
   ];
-
-
-
 
   boot = {
     kernelPackages = pkgs.linuxPackages_zen;
@@ -51,64 +45,14 @@ in
     plymouth.enable = true;
   };
 
-
-  nix.settings = {
-  #  experimental-features = [
-  #    "nix-command"
-  #    "flakes"
-  #  ];
-    substituters = [
-      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-      "https://cache.nixos.org"
-    ];
-  #  trusted-public-keys = [
-  #    "cache.nixos.org-1:your-public-key"
-  #  ];
-  };
-
-
-
-
-
-  stylix = {
-    enable = true;
-    image = ../../config/wallpapers/beautifulmountainscape.jpg;
-    polarity = "dark";
-    opacity.terminal = 0.8;
-    cursor.package = pkgs.bibata-cursors;
-    cursor.name = "Bibata-Modern-Ice";
-    cursor.size = 24;
-    fonts = {
-      monospace = {
-        package = pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; };
-        name = "JetBrainsMono Nerd Font Mono";
-      };
-      sansSerif = {
-        package = pkgs.montserrat;
-        name = "Montserrat";
-      };
-      serif = {
-        package = pkgs.montserrat;
-        name = "Montserrat";
-      };
-      sizes = {
-        applications = 12;
-        terminal = 15;
-        desktop = 11;
-        popups = 12;
-      };
-    };
+  drivers = {
+    amdgpu.enable = false;
+    nvidia.enable = false;
+    nvidia-prime.enable = false;
+    intel.enable = true;
   };
 
   input.fcitx5.enable = true;
-  drivers.amdgpu.enable = true;
-  drivers.nvidia.enable = false;
-  drivers.nvidia-prime = {
-    enable = false;
-    intelBusID = "";
-    nvidiaBusID = "";
-  };
-  drivers.intel.enable = false;
   vm.guest-services.enable = false;
   local.hardware-clock.enable = false;
 
@@ -116,7 +60,6 @@ in
   networking.hostName = host;
   networking.timeServers = options.networking.timeServers.default ++ [ "pool.ntp.org" ];
   networking.firewall.enable = false;
-
 
   time.timeZone = "Asia/Tokyo";
 
@@ -132,8 +75,6 @@ in
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
-
 
   programs = {
     firefox.enable = false;
@@ -334,7 +275,7 @@ in
       jack.enable = true;
     };
     gnome.gnome-keyring.enable = true;
-    power-profiles-daemon.enable = true;
+    power-profiles-daemon.enable = false;
     rpcbind.enable = false;
     nfs.server.enable = false;
     roon-bridge = {
@@ -348,11 +289,32 @@ in
         autoStart = false;
       };
     };
+    thermald.enable = true;
+    tlp = {
+      enable = true;
+      settings = {
+        CPU_SCALING_GOVERNOR_ON_AC = "performance";
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+        CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+      };
+    };
   };
 
   hardware.sane.enable = true;
   hardware.logitech.wireless.enable = false;
-  hardware.bluetooth.enable = false;
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  hardware.cpu.intel.updateMicrocode = true;
+  hardware.opengl = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver  # VAAPI
+      vaapiIntel         # VAAPI
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
+  };
   security.rtkit.enable = true;
   security.polkit.enable = true;
   nix.settings = {
@@ -375,6 +337,18 @@ in
   };
 
   # Add a proper closing brace for the entire configuration
+
+  # 启用触摸板支持
+  services.xserver.libinput = {
+    enable = true;
+    touchpad = {
+      tapping = true;
+      naturalScrolling = true;
+      scrollMethod = "twofinger";
+      accelSpeed = "0.5";
+      disableWhileTyping = true;
+    };
+  };
 }
 
 

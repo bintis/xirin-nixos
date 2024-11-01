@@ -42,20 +42,42 @@ with lib;
           env = XDG_SESSION_DESKTOP, Hyprland
           env = GDK_BACKEND, wayland
           env = CLUTTER_BACKEND, wayland
-          env = QT_QPA_PLATFORM=wayland;xcb
+          env = QT_QPA_PLATFORM, wayland
           env = QT_WAYLAND_DISABLE_WINDOWDECORATION, 1
           env = QT_AUTO_SCREEN_SCALE_FACTOR, 1
-          env = SDL_VIDEODRIVER
+          env = _JAVA_AWT_WM_NONREPARENTING, 1
+          env = LIBSEAT_BACKEND, logind
+          env = SDL_VIDEODRIVER, wayland
           env = MOZ_ENABLE_WAYLAND, 1
+          env = LIBSEAT_BACKEND, logind
+          env = GTK_IM_MODULE, fcitx
+          env = QT_IM_MODULE, fcitx
+          env = XMODIFIERS, @im=fcitx
+          env = SDL_IM_MODULE, fcitx
+          env = GLFW_IM_MODULE, fcitx
+          env = INPUT_METHOD, fcitx
+          env = FCITX_SOCKET, unix:/tmp/fcitx5-socket
+          env = FCITX_NO_PREEDIT_APPS, "*"
+          env = GLFW_IM_MODULE, fcitx
+          env = GTK_IM_MODULE, fcitx
+          env = QT_IM_MODULE, fcitx
+          env = XMODIFIERS, @im=fcitx
+          env = SDL_IM_MODULE, fcitx
+          env = INPUT_METHOD, fcitx
+          env = FCITX5_NO_PREEDIT, 1
+          env = FCITX5_WAYLAND_per_window_input_method, 1
+
           exec-once = asztal
-          exec-once = fcitx5 -d
-          exec-once = dbus-update-activation-environment --systemd --all
-          exec-once = systemctl --user import-environment QT_QPA_PLATFORMTHEME WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+          exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=Hyprland
+          exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+          exec-once = fcitx5 -d --replace
+          exec-once = sleep 2 && dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
           exec-once = killall -q swww;sleep .5 && swww init
           #exec-once = killall -q waybar;sleep .5 && waybar
           exec-once = killall -q swaync;sleep .5 && swaync
           exec-once = nm-applet --indicator
           exec-once = lxqt-policykit-agent
+          exec-once = ${pkgs.gnome.gnome-keyring}/bin/gnome-keyring-daemon --start --components=secrets,ssh,pkcs11
           exec-once = sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/beautifulmountainscape.jpg
           monitor=,preferred,auto,1.5
           ${extraMonitorSettings}
@@ -153,7 +175,7 @@ with lib;
           bind =  CTRL, RIGHT, exec, hyprnome
           bind =  CTRL, UP, exec, hyprnome --previous --move
           bind =  CTRL, DOWN, exec, hyprnome --move
-          bind = ${modifier},Return,exec,${terminal}
+          bind =  ${modifier},Return,exec,${terminal}
           bind = CTRL,Return,exec,rofi-launcher
           bind = ${modifier}SHIFT,W,exec,web-search
           bind = ${modifier}ALT,W,exec,wallsetter
@@ -229,9 +251,21 @@ with lib;
           bind = ,XF86AudioPrev, exec, playerctl previous
           bind = ,XF86MonBrightnessDown,exec,brightnessctl set 5%-
           bind = ,XF86MonBrightnessUp,exec,brightnessctl set +5%
+          env = _JAVA_AWT_WM_NONREPARENTING, 1
+          
+
         ''
       ];
   };
 }
+
+
+
+
+
+
+
+
+
 
 

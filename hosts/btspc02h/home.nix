@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   username,
   host,
   ...
@@ -79,9 +80,14 @@ in
   stylix.targets.rofi.enable = false;
   stylix.targets.hyprland.enable = false;
   gtk = {
+    enable = true;
     iconTheme = {
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
+    };
+    theme = {
+      name = lib.mkForce "adw-gtk3";  # Force the theme name to match
+      package = lib.mkForce pkgs.adw-gtk3;  # Using mkForce to override other definitions
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
@@ -98,7 +104,7 @@ in
 
 
   # Scripts
-  home.packages = [
+  home.packages = with pkgs; [
     (import ../../scripts/emopicker9000.nix { inherit pkgs; })
     (import ../../scripts/task-waybar.nix { inherit pkgs; })
     (import ../../scripts/squirtle.nix { inherit pkgs; })
@@ -114,6 +120,11 @@ in
       inherit pkgs;
       inherit host;
     })
+    gnome.adwaita-icon-theme
+    papirus-icon-theme
+    hicolor-icon-theme
+    power-profiles-daemon  # For power profiles support
+    adwaita-icon-theme  # Changed from gnome.adwaita-icon-theme
   ];
 
   services = {
@@ -137,6 +148,7 @@ in
         ];
       };
     };
+
   };
 
   programs = {
@@ -242,5 +254,35 @@ in
         ];
       };
     };
+  };
+
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "/run/user/1000/keyring/ssh";  # Replace 1000 with your user ID
+    GNOME_KEYRING_CONTROL = "/run/user/1000/keyring/control";  # Replace 1000 with your user ID
+  };
+
+  systemd.user.services.gnome-keyring = {
+    Unit = {
+      Description = "GNOME Keyring daemon";
+      PartOf = ["graphical-session.target"];
+    };
+    Service = {
+      ExecStart = "${pkgs.gnome.gnome-keyring}/bin/gnome-keyring-daemon --foreground --components=secrets,ssh,pkcs11";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = ["graphical-session.target"];
+    };
+  };
+
+  home.file = {
+    ".local/share/icons/hicolor/scalable/apps/Alacritty.svg".source = 
+      "${pkgs.alacritty}/share/applications/Alacritty.svg";
+    
+    ".local/share/icons/hicolor/scalable/apps/org.xfce.thunar.svg".source = 
+      "${pkgs.xfce.thunar}/share/icons/hicolor/scalable/apps/org.xfce.thunar.svg";
+    
+    ".local/share/icons/hicolor/scalable/apps/session-desktop.svg".source = 
+      "${pkgs.session-desktop}/share/icons/hicolor/scalable/apps/session-desktop.svg";
   };
 }

@@ -17,7 +17,10 @@
        url = "github:hyprwm/hyprland-plugins";
        inputs.hyprland.follows = "hyprland";
     };
-
+    session-desktop = {
+      url = "github:oxen-io/session-desktop";
+      flake = false;
+    };
   };
 
   outputs =

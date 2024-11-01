@@ -116,10 +116,24 @@ in
         addons = with pkgs; [
           fcitx5-mozc
           fcitx5-rime
+          fcitx5-gtk
+          fcitx5-configtool
+          fcitx5-chinese-addons
+          fcitx5-table-extra
+          fcitx5-lua
+          fcitx5-m17n
         ];
-      waylandFrontend = true;
+        waylandFrontend = true;
       };
+    };
+
+    environment.sessionVariables = {
+      GTK_IM_MODULE = "fcitx";
+      QT_IM_MODULE = "fcitx";
+      XMODIFIERS = "@im=fcitx";
+      INPUT_METHOD = "fcitx";
+      SDL_IM_MODULE = "fcitx";
+      GLFW_IM_MODULE = "fcitx";
     };
   };
 }
-
