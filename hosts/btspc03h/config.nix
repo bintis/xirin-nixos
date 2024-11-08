@@ -46,9 +46,6 @@ in
   };
 
   drivers = {
-    amdgpu.enable = false;
-    nvidia.enable = false;
-    nvidia-prime.enable = false;
     intel.enable = true;
   };
 
@@ -322,10 +319,45 @@ in
     experimental-features = [ "nix-command" "flakes" ];
   };
 
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = { enable = true; dockerCompat = true; };
-#  services.roon-bridge.enable = true;
-#   services.roon-bridge.openFirewall = true;
+
+  # Add container configurations
+  environment.etc = {
+    "containers/policy.json" = {
+      mode = "0644";
+      text = ''
+        {
+          "default": [
+            {
+              "type": "insecureAcceptAnything"
+            }
+          ],
+          "transports": {
+            "docker-daemon": {
+              "": [
+                {
+                  "type": "insecureAcceptAnything"
+                }
+              ]
+            }
+          }
+        }
+      '';
+    };
+    "containers/registries.conf" = {
+      mode = "0644";
+      text = ''
+        [registries.search]
+        registries = ['docker.io']
+        
+        [registries.insecure]
+        registries = []
+        
+        [registries.block]
+        registries = []
+      '';
+    };
+  };
+
 
   console.keyMap = "${keyboardLayout}";
   system.stateVersion = "23.11";
@@ -347,6 +379,13 @@ in
       scrollMethod = "twofinger";
       accelSpeed = "0.5";
       disableWhileTyping = true;
+    };
+  };
+
+  stylix = {
+    image = pkgs.fetchurl {
+      url = "https://raw.githubusercontent.com/NixOS/nixos-artwork/master/wallpapers/nix-wallpaper-simple-blue.png";
+      sha256 = "utrcjzfeJoFOpUbFY2eIUNCKy5rjLt57xIoUUssJmdI=";
     };
   };
 }

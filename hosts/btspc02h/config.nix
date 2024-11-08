@@ -22,6 +22,7 @@ in
     ../../modules/intel-drivers.nix
     ../../modules/vm-guest-services.nix
     ../../modules/local-hardware-clock.nix
+    ../../modules/headscale-client.nix
   ];
 
 
@@ -348,6 +349,11 @@ in
         autoStart = false;
       };
     };
+    headscale-client = {
+      enable = true;
+      routes = [
+      ];
+    };
   };
 
   hardware.sane.enable = true;
@@ -360,15 +366,78 @@ in
     experimental-features = [ "nix-command" "flakes" ];
   };
 
-  virtualisation.libvirtd.enable = true;
-  virtualisation.podman = { enable = true; dockerCompat = true; };
-#  services.roon-bridge.enable = true;
-#   services.roon-bridge.openFirewall = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+      # 启用 rootless 模式
+      rootless = {
+        enable = true;
+        setSocketVariable = true;
+      };
+    };
+  };
+
+  # 创建必要的目录和文件
+  system.activationScripts = {
+    podman-files = ''
+      mkdir -p /etc/containers
+      if [ ! -f /etc/containers/policy.json ]; then
+        cat > /etc/containers/policy.json << 'EOF'
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports": {
+        "docker-daemon": {
+            "": [
+                {
+                    "type": "insecureAcceptAnything"
+                }
+            ]
+        }
+    }
+}
+EOF
+      fi
+
+      if [ ! -f /etc/containers/registries.conf ]; then
+        cat > /etc/containers/registries.conf << 'EOF'
+[registries.search]
+registries = ['docker.io']
+
+[registries.insecure]
+registries = []
+
+[registries.block]
+registries = []
+EOF
+      fi
+
+      chmod 644 /etc/containers/policy.json
+      chmod 644 /etc/containers/registries.conf
+    '';
+  };
+
+  # 确保服务启动
+  systemd.services.podman.enable = true;
+
+  users.users.bintis = {
+    extraGroups = [ "podman" "docker" ];
+    subUidRanges = [{ 
+      startUid = 100000;
+      count = 65536;
+    }];
+    subGidRanges = [{
+      startGid = 100000;
+      count = 65536;
+    }];
+  };
 
   console.keyMap = "${keyboardLayout}";
   system.stateVersion = "23.11";
 
-  # Security settings for GNOME keyring
   security.pam.services = {
     login.enableGnomeKeyring = true;
     greetd.enableGnomeKeyring = true;

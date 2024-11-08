@@ -26,41 +26,70 @@
   outputs =
     { nixpkgs, home-manager, nixos-cosmic,... }@inputs:
     let
-      system = "aarch64-linux";
-      host = "btspc02h";
-      username = "bintis";
+      system = "x86_64-linux";
     in
     {
       nixosConfigurations = {
-        "${host}" = nixpkgs.lib.nixosSystem {
+        "btspc02h" = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit system;
             inherit inputs;
-            inherit username;
-            inherit host;
+            username = "bintis";
+            host = "btspc02h";
           };
           modules = [
-
-           {
-             nix.settings = {
-               substituters = [ "https://cosmic.cachix.org/" ];
-               trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
-             };
-           }
+            {
+              nix.settings = {
+                substituters = [ "https://cosmic.cachix.org/" ];
+                trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
+              };
+            }
             nixos-cosmic.nixosModules.default
-            ./hosts/${host}/config.nix
+            ./hosts/btspc02h/config.nix
             inputs.stylix.nixosModules.stylix
             home-manager.nixosModules.home-manager
             {
               home-manager.extraSpecialArgs = {
-                inherit username;
+                username = "bintis";
                 inherit inputs;
-                inherit host;
+                host = "btspc02h";
               };
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
-              home-manager.users.${username} = import ./hosts/${host}/home.nix;
+              home-manager.users.bintis = import ./hosts/btspc02h/home.nix;
+            }
+          ];
+        };
+
+        "btspc03h" = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit system;
+            inherit inputs;
+            username = "bintis";
+            host = "btspc03h";
+          };
+          modules = [
+            {
+              nix.settings = {
+                substituters = [ "https://cosmic.cachix.org/" ];
+                trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
+              };
+            }
+            nixos-cosmic.nixosModules.default
+            ./hosts/btspc03h/config.nix
+            inputs.stylix.nixosModules.stylix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.extraSpecialArgs = {
+                username = "bintis";
+                inherit inputs;
+                host = "btspc03h";
+              };
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "backup";
+              home-manager.users.bintis = import ./hosts/btspc03h/home.nix;
             }
           ];
         };

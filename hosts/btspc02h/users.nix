@@ -19,6 +19,7 @@ in
         "libvirtd"
         "scanner"
         "lp"
+        "docker"
       ];
       shell = pkgs.bash;
       ignoreShellProgramCheck = true;
@@ -60,9 +61,11 @@ in
         cargo
         ansible
         iftop
+        websocat
         mercurial
         alacritty
         python3
+        protobuf
        # session-desktop
 #         (session-desktop.overrideAttrs (oldAttrs: {
 #           postInstall = ''
