@@ -32,6 +32,11 @@
       ExecStop = "${pkgs.fuse}/bin/fusermount -u /mnt/pcloud";
       Restart = "on-failure";
       RestartSec = "10s";
+      
+      # Improve shutdown time
+      TimeoutStopSec = 10;
+      KillMode = "process";
+      KillSignal = "SIGINT";
     };
   };
 }

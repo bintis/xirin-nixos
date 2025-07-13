@@ -34,6 +34,7 @@
     wget # Tool For Fetching Files With Links
     qq
     rclone
+    tailscale
   ];
 }
 

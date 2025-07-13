@@ -15,7 +15,10 @@
     displayManager.cosmic-greeter.enable = true;
   };
   
-  # Import rclone mount configuration
-  imports = [ ./rclone-mount.nix ];
+  # Import configurations
+  imports = [ 
+    ./rclone-mount.nix 
+    ./shutdown-optimization.nix
+  ];
 }
 
