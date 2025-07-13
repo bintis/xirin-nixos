@@ -1,4 +1,4 @@
-{profile, username, ...}: {
+{profile, username, pkgs, ...}: {
   # Services to start
   services = {
     fstrim.enable = true; # SSD Optimizer
@@ -14,4 +14,8 @@
     desktopManager.cosmic.enable = true;
     displayManager.cosmic-greeter.enable = true;
   };
+  
+  # Import rclone mount configuration
+  imports = [ ./rclone-mount.nix ];
 }
+
