@@ -14,6 +14,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    cifs-utils
     google-chrome
     docker-compose # Allows Controlling Docker From A Single File
     eza # Beautiful ls Replacement

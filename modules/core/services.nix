@@ -20,6 +20,7 @@
     ./rclone-mount.nix 
     ./shutdown-optimization.nix
     ./tailscale.nix
+    ./smb-mount.nix
   ];
 }
 
