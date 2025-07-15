@@ -9,15 +9,10 @@
     kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" "radeon.si_support=0" "radeon.cik_support=0" "amdgpu.si_support=1" "amdgpu.cik_support=1" ];
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
-    # Appimage Support
-    binfmt.registrations.appimage = {
-      wrapInterpreterInShell = false;
-      interpreter = "${pkgs.appimage-run}/bin/appimage-run";
-      recognitionType = "magic";
-      offset = 0;
-      mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
-      magicOrExtension = ''\x7fELF....AI\x02'';
-    };
+
+    # Enable systemd-based initrd instead of legacy script-based initrd
+    initrd.systemd.enable = true;
+    
     plymouth.enable = true;
   };
 }

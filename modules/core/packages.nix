@@ -36,6 +36,8 @@
     qq
     rclone
     tailscale
+    virt-manager
+    remmina
   ];
 }
 

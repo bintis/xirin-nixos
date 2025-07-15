@@ -22,6 +22,7 @@ i18n.inputMethod.fcitx5.settings.inputMethod = {
   };
   "Groups/0/Items/0".Name = "keyboard-jp";
   "Groups/0/Items/1".Name = "mozc";
+  "Groups/0/Items/2".Name = "rime";
 };
 
 

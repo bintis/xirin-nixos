@@ -7,6 +7,13 @@
   # Set hostname
   networking.hostName = "btspc01h";
   
+  # Bridge configuration for Xen VM
+  networking.bridges = {
+    "xenbr0" = {
+      interfaces = [ "enp8s0f0" ];  # Physical interface
+    };
+  };
+  
   # Firewall configuration
   networking.firewall = {
     enable = true;

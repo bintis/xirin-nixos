@@ -1,4 +1,4 @@
-{profile, username, pkgs, lib, ... }:
+{profile, username, pkgs, lib, config, ... }:
 
 let 
   # Common CIFS mount options
@@ -12,12 +12,38 @@ let
     "vers=2.0"
     "x-systemd.automount"
     "noauto"
+    "x-systemd.device-timeout=5"
+    "x-systemd.mount-timeout=5s"
+    "x-systemd.idle-timeout=1min"
   ];
   
   # Use a placeholder for the server that will be replaced during the actual mount
   # This keeps the IP address out of the Git repository
   server = "192.168.1.40"; # Replace with placeholder in public repo
 in {
+  # Set global systemd mount timeouts
+  systemd.extraConfig = ''
+    DefaultTimeoutStopSec=5s
+  '';
+  
+  # Configure systemd to kill SMB mounts quickly during shutdown
+  systemd.services = {
+    "home-${username}-Drive-Disk1.mount" = {
+      serviceConfig = {
+        TimeoutStopSec = "5s";
+      };
+    };
+    "home-${username}-Drive-Disk2.mount" = {
+      serviceConfig = {
+        TimeoutStopSec = "5s";
+      };
+    };
+    "home-${username}-Drive-Disk3.mount" = {
+      serviceConfig = {
+        TimeoutStopSec = "5s";
+      };
+    };
+  };
   # Create the mount directories
   systemd.tmpfiles.rules = [
     "d /home/${username}/Drive/Disk1 0755 ${username} users - -"
