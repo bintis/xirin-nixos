@@ -9,8 +9,6 @@ in {
     ./eza.nix 
     ./fastfetch
     ./gh.nix
-    ./git.nix
-    ./lazygit.nix
     ./obs-studio.nix
     ./qt.nix
     ./scripts

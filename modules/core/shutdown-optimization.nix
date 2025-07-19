@@ -8,14 +8,6 @@
     
     # Configure specific problematic services
     services = {
-      # Fix bluetooth timeout issues
-      bluetooth = {
-        serviceConfig = {
-          TimeoutStopSec = 5;
-          KillMode = "mixed";
-        };
-      };
-      
       # Fix session timeout issues
       "user@" = {
         serviceConfig = {

@@ -15,6 +15,7 @@
 
   environment.systemPackages = with pkgs; [
     cifs-utils
+    git
     google-chrome
     docker-compose # Allows Controlling Docker From A Single File
     eza # Beautiful ls Replacement
@@ -38,6 +39,15 @@
     tailscale
     virt-manager
     remmina
+    # Rust development tools
+    rustc
+    cargo
+    rustfmt
+    rust-analyzer
+    clippy
+    gcc
+    ghostty
+    rustdesk
   ];
 }
 

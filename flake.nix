@@ -7,20 +7,36 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-    nvf.url = "github:notashelf/nvf";
-    hyprland.url = "github:hyprwm/Hyprland";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.hyprland.follows = "hyprland";
+    flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = {nixpkgs, ...} @ inputs: let
+  outputs = {nixpkgs, flake-utils, rust-overlay, ...} @ inputs: let
     system = "x86_64-linux";
     host = "btspc01h";
     profile = "amd";
     username = "bintis";
   in {
+    # Add flake-utils.lib.eachDefaultSystem configuration
+    } // flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ rust-overlay.overlays.default ];
+        };
+      in
+      {
+        devShells.default = pkgs.mkShell {
+          packages = [
+            pkgs.rust-bin.stable.latest.default
+          ];
+        };
+      }
+    ) // {
     nixosConfigurations = {
       amd = nixpkgs.lib.nixosSystem {
         inherit system;

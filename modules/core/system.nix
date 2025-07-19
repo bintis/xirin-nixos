@@ -1,4 +1,4 @@
-{host, ...}: let
+{host, lib, ...}: let
   inherit (import ../../hosts/${host}/variables.nix) consoleKeyMap;
 in {
   nix = {
@@ -13,7 +13,7 @@ in {
       trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
   };
-  time.timeZone = "America/Chicago";
+  time.timeZone = "Asia/Tokyo";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
@@ -26,10 +26,13 @@ in {
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-  environment.variables = {
-    ZANEYOS_VERSION = "2.3.1";
-    ZANEYOS = "true";
-  };
+
+  # SystemD Services Edits
+  services.journald.extraConfig = "SystemMaxUse=50M";
+  systemd.services.NetworkManager-wait-online.wantedBy = lib.mkForce [];
+
+
+
   console.keyMap = "${consoleKeyMap}";
-  system.stateVersion = "23.11"; # Do not change!
+  system.stateVersion = "25.05";
 }

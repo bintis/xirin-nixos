@@ -20,7 +20,9 @@
     ./rclone-mount.nix 
     ./shutdown-optimization.nix
     ./tailscale.nix
-    ./smb-mount.nix
+    #./smb-mount.nix
+    ./sftp-mount.nix
+    ./bluetooth.nix
   ];
 }
 

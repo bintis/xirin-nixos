@@ -23,40 +23,27 @@ let
 in {
   # Set global systemd mount timeouts
   systemd.extraConfig = ''
-    DefaultTimeoutStopSec=5s
+    DefaultTimeoutStopSec=1s
   '';
   
   # Configure systemd to kill SMB mounts quickly during shutdown
   systemd.services = {
-    "home-${username}-Drive-Disk1.mount" = {
-      serviceConfig = {
-        TimeoutStopSec = "5s";
-      };
-    };
     "home-${username}-Drive-Disk2.mount" = {
       serviceConfig = {
-        TimeoutStopSec = "5s";
+        TimeoutStopSec = "1s";
       };
     };
     "home-${username}-Drive-Disk3.mount" = {
       serviceConfig = {
-        TimeoutStopSec = "5s";
+        TimeoutStopSec = "1s";
       };
     };
   };
   # Create the mount directories
   systemd.tmpfiles.rules = [
-    "d /home/${username}/Drive/Disk1 0755 ${username} users - -"
     "d /home/${username}/Drive/Disk2 0755 ${username} users - -"
     "d /home/${username}/Drive/Disk3 0755 ${username} users - -"
   ];
-  
-  # Mount disk1
-  fileSystems."/home/${username}/Drive/Disk1" = {
-    device = "//${server}/disk1";
-    fsType = "cifs";
-    options = commonOptions;
-  };
   
   # Mount disk2
   fileSystems."/home/${username}/Drive/Disk2" = {

@@ -5,9 +5,8 @@
   host,
   profile,
   ...
-}: let
-  inherit (import ../../hosts/${host}/variables.nix) gitUsername;
-in {
+}: {
+
   imports = [inputs.home-manager.nixosModules.home-manager];
   home-manager = {
     useUserPackages = true;
@@ -26,7 +25,7 @@ in {
   users.mutableUsers = true;
   users.users.${username} = {
     isNormalUser = true;
-    description = "${gitUsername}";
+    description = "${username}";
     extraGroups = [
       "adbusers"
       "docker"

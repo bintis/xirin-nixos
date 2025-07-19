@@ -7,6 +7,8 @@
     package = pkgs.tailscale;
     # Accept routes advertised by other Tailscale devices
     useRoutingFeatures = "client";
+    # Start service after the graphical environment is available
+    extraUpFlags = [];
   };
 
   # Allow IP forwarding for Tailscale to work as a subnet router or exit node (if needed)
